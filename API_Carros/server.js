@@ -1,5 +1,4 @@
 import express from "express"
-import { randomUUID } from "node:crypto"
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -51,10 +50,6 @@ app.get('/carros/:id', async (req, res) => {
 
 })
 
-
-
-
-
 app.post('/carros', async (req, res) => {
   try {
     const carro = await prisma.carro.create({
@@ -62,7 +57,7 @@ app.post('/carros', async (req, res) => {
         nome: req.body.nome,
         ano: req.body.ano,
         marca: req.body.marca,
-        preco: req.body.preco,
+        preco: req.body.preco,  
         hp: req.body.hp,
         velocidade_maxima: req.body.velocidade_maxima,
         descricao: req.body.descricao
@@ -77,6 +72,55 @@ app.post('/carros', async (req, res) => {
     });
   }
 });
+
+app.delete("/carros/:id", async (req, res) => {
+
+  const id = req.params.id
+
+  try{
+     const deletarCarro = await prisma.carro.delete({
+    where: {
+      id : id
+    }
+  });
+      res.status(200).json({
+        mensagem: "Carro excluído com sucesso",
+        carro: deletarCarro
+    });
+      
+  }catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      mensagem: "Erro ao deletar carro"
+    });
+  }
+})
+
+app.put("/carros/:id", async (req, res) => {
+    
+  const id = req.params.id
+
+  const updateCarro = await prisma.carro.update({
+    where: {
+      id : id 
+    },
+     data: {
+        nome: req.body.nome,
+        ano: req.body.ano,
+        marca: req.body.marca,
+        preco: req.body.preco,  
+        hp: req.body.hp,
+        velocidade_maxima: req.body.velocidade_maxima,
+        descricao: req.body.descricao
+      }
+ })
+    res.status(200).json({
+      mensagem: "Carro atualizado com sucesso"
+    });
+  
+
+  });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
