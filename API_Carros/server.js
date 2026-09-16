@@ -20,14 +20,26 @@ const prisma = new PrismaClient({ adapter: mysqlAdapter });
 
 app.get('/carros', async (req, res) => {
   const carros = await prisma.carro.findMany();
-  res.json(carros);
+
+  if(carros.length < 1) {
+    return res.status(404).json({
+        mensagem: "Nenhum Carro encontrado"
+    })
+    
+  }
+    res.json(carros);
 });
 
-app.get('/carros/:id', (req, res) => {
+
+app.get('/carros/:id', async (req, res) => {
 
      const id = req.params.id;
 
-    const carro = carros.find(carro => carro.id === id);
+    const carro = await prisma.carro.findUnique({
+    where: {
+        id: id
+    }
+})
 
     if (!carro) {
         return res.status(404).json({
@@ -38,6 +50,8 @@ app.get('/carros/:id', (req, res) => {
     res.json(carro);
 
 })
+
+
 
 
 
